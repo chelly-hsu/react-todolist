@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { AuthContext } from "./components/Context";
 import './App.css';
 import {
   HashRouter,
@@ -10,30 +12,33 @@ import Login from './pages/login';
 import Register from './pages/signup'
 
 function App() {
+  const [token, setToken] = useState(null);
   return (
     <div className="container">
-      <HashRouter>
-        <div className="nav-link">
-          <NavLink to="/">
-            <p>回到首頁</p>
-          </NavLink>
-          <NavLink to="/register">
-            <p>註冊頁面</p>
-          </NavLink>
-          <NavLink to="/login">
-            <p>登入頁面</p>
-          </NavLink>
-          <NavLink to="/todo">
-            <p>Todo 頁面</p>
-          </NavLink>
-        </div>
-        <Routes>
-          <Route path="/" element={<p>這是首頁</p>} />
-          <Route path="register" element={<Register />} />
-          <Route path="login" element={<Login />} />
-          <Route path="todo" element={<Todolist />} />
-        </Routes>
-      </HashRouter>
+      <AuthContext.Provider value={{ token, setToken }}>
+        <HashRouter>
+          <div className="nav-link">
+            <NavLink to="/">
+              <p>回到首頁</p>
+            </NavLink>
+            <NavLink to="/register">
+              <p>註冊頁面</p>
+            </NavLink>
+            <NavLink to="/login">
+              <p>登入頁面</p>
+            </NavLink>
+            <NavLink to="/todo">
+              <p>Todo 頁面</p>
+            </NavLink>
+          </div>
+          <Routes>
+            <Route path="/" element={<p>這是首頁</p>} />
+            <Route path="register" element={<Register />} />
+            <Route path="login" element={<Login />} />
+            <Route path="todo" element={<Todolist />} />
+          </Routes>
+        </HashRouter>
+      </AuthContext.Provider>
     </div>
   );
 }
