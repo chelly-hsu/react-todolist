@@ -6,13 +6,8 @@ import {
   Routes,
 } from 'react-router-dom';
 import Todolist from './pages/todolist';
-
-const Login = () => {
-  return <p>這是登入頁面</p>;
-};
-const Register = () => {
-  return <p>這是註冊頁面</p>;
-};
+import Login from './pages/login';
+import Register from './pages/signup'
 
 function App() {
   return (
