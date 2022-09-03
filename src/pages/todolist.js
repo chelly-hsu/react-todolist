@@ -122,10 +122,11 @@ function Todolist (){
                   <div className="todoList_items">
                     <ListLi currentTab={currentTab} setCurrentTab={setCurrentTab}></ListLi>
                     <div className="todoList_statistics">
-                      { currentTab === 2 
+                      <p>{allList.filter(item=> item.checked === false).length} 待完成項目</p>
+                      {/* { currentTab === 1 || currentTab === 2 
                         ? <p>{allList.filter(item=> item.checked === false).length} 待完成項目</p>
                         : <p>{allList.filter(item=> item.checked === true).length} 個已完成項目</p>
-                      }
+                      } */}
                         <span onClick={ ()=> setAllList(
                           allList.filter(item=> item.checked === false)) }>清除已完成項目</span>
                     </div>
