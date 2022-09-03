@@ -1,41 +1,61 @@
 import { useState } from 'react';
+import { useAuth } from "./components/Context";
 import { AuthContext } from "./components/Context";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 import './App.css';
 import {
   HashRouter,
   NavLink,
   Route,
   Routes,
+  Outlet
 } from 'react-router-dom';
 import Todolist from './pages/todolist';
 import Login from './pages/login';
 import Register from './pages/signup'
 
+
+function Layout() {
+  const { token } = useAuth();
+  return (
+    <>
+      {/* <nav>
+        <li>
+          <NavLink to='/'>Home</NavLink>
+        </li>
+        <li>
+          <NavLink to='/signup'>signup</NavLink>
+        </li>
+        <li>
+          <NavLink to='/login'>login</NavLink>
+        </li>
+        {
+          token && <li>
+            <NavLink to='/todo'>todo</NavLink>
+          </li>
+        }
+      </nav> */}
+      <div className="content">
+        <Outlet />
+      </div>
+    </>
+  );
+}
 function App() {
   const [token, setToken] = useState(null);
   return (
     <div className="container">
       <AuthContext.Provider value={{ token, setToken }}>
         <HashRouter>
-          <div className="nav-link">
-            <NavLink to="/">
-              <p>回到首頁</p>
-            </NavLink>
-            <NavLink to="/register">
-              <p>註冊頁面</p>
-            </NavLink>
-            <NavLink to="/login">
-              <p>登入頁面</p>
-            </NavLink>
-            <NavLink to="/todo">
-              <p>Todo 頁面</p>
-            </NavLink>
-          </div>
           <Routes>
-            <Route path="/" element={<p>這是首頁</p>} />
-            <Route path="register" element={<Register />} />
-            <Route path="login" element={<Login />} />
-            <Route path="todo" element={<Todolist />} />
+            <Route path="/" element={<Layout />}>
+              <Route path="/" element={<Login />} />
+              <Route path="register" element={<Register />} />
+              <Route path="login" element={<Login />} />
+              <Route element={<ProtectedRoute />}>
+                <Route path="/todo" element={<Todolist />} />
+              </Route>
+            </Route>
           </Routes>
         </HashRouter>
       </AuthContext.Provider>
