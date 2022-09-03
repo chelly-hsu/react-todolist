@@ -5,11 +5,8 @@ import {
   Route,
   Routes,
 } from 'react-router-dom';
+import Todolist from './pages/todolist';
 
-const Todo = () => {
-  return <p>這是 Todo 頁面 
-  </p>;
-};
 const Login = () => {
   return <p>這是登入頁面</p>;
 };
@@ -39,9 +36,8 @@ function App() {
           <Route path="/" element={<p>這是首頁</p>} />
           <Route path="register" element={<Register />} />
           <Route path="login" element={<Login />} />
-          <Route path="todo" element={<Todo />} />
+          <Route path="todo" element={<Todolist />} />
         </Routes>
-        {/* 練習區 */}
       </HashRouter>
     </div>
   );
