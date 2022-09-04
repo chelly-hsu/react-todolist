@@ -1,5 +1,4 @@
 import React from "react";
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from "./../components/Context";
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
@@ -8,9 +7,9 @@ const MySwal = withReactContent(Swal);
 function Header() {
     const { token, setToken } = useAuth()
     const userName = localStorage.userName;
-    let navigate = useNavigate();
 
     const axios = require('axios').default;
+    localStorage.setItem('token', token);
     const logOutBtn = (data) => {
         const postData = { user: data };
         console.log(postData)

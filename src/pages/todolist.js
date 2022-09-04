@@ -4,61 +4,42 @@ import { faPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
 import emptyPic from './../images/empty.png'
 import Header from './../components/Header'
 import { useAuth } from "./../components/Context";
-import { useNavigate, Link } from "react-router-dom"
 
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 const MySwal = withReactContent(Swal);
 
 function Todolist() {
-  const { token, setToken } = useAuth();
-  const navigate = useNavigate();
+  const { token } = useAuth();
   const [allList, setAllList] = useState([]); //全部清單
   const [currentTab, setCurrentTab] = useState(1) //目前頁籤
 
   const axios = require('axios').default;
-  // 取得清單
-  function getTodo() {
-    axios.get('https://todoo.5xcamp.us/todos', { headers: { 'Authorization': token } })
-      .then(resHead => {
-        console.log('resHead', resHead)
-        setAllList(resHead.data.todos)
 
-        // MySwal.fire({
-        //   icon: 'success',
-        //   title: resHead.data.message,
-        // })
-      })
-      .catch(err => {
-        console.log('err', err)
-        const error = err.response.data
-        return MySwal.fire({
-          icon: 'error',
-          title: error.message,
-        })
-      })
-  }
+  // 取得清單
   useEffect(() => {
+    async function getTodo() {
+      await axios.get('https://todoo.5xcamp.us/todos', { headers: { 'Authorization': token } })
+        .then(resHead => {
+          console.log('resHead', resHead)
+
+          setAllList(resHead.data.todos)
+          // MySwal.fire({
+          //   icon: 'success',
+          //   title: resHead.data.message,
+          // })
+        })
+        .catch(err => {
+          console.log('err', err)
+          const error = err.response.data
+          return MySwal.fire({
+            icon: 'error',
+            title: error.message,
+          })
+        })
+    };
     getTodo()
-  }, [])
-  // const getTodo = () => {
-  //   const _url = "https://todoo.5xcamp.us/todos";
-  //   fetch(_url, {
-  //     method: 'GET',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //       'authorization': token
-  //     }
-  //   })
-  //     .then(resHead => {
-  //       console.log(resHead)
-  //       return resHead.json()
-  //     })
-  //     .then(response => {
-  //       console.log(response)
-  //       setAllList(response.todos)
-  //     })
-  // }
+  }, [axios, token])
 
   // todo列表
   function TodoListArea(props) {
@@ -90,19 +71,15 @@ function Todolist() {
         headers: { 'Authorization': token },
       })
         .then(resHead => {
-          console.log('resHead', resHead)
           const index = allList.map(item => item.id).indexOf(resHead.data.id)
           allList[index].completed_at = resHead.data.completed_at
           setAllList([...allList])
-          console.log(allList)
-
           // MySwal.fire({
           //   icon: 'success',
           //   title: resHead.data.message,
           // })
         })
         .catch(err => {
-          console.log('err', err)
           const error = err.response.data
           return MySwal.fire({
             icon: 'error',
@@ -113,7 +90,6 @@ function Todolist() {
 
     // 刪除 delete button
     function delTodoItem(id) {
-      console.log(id)
       axios.delete(`https://todoo.5xcamp.us/todos/${id}`, {
         headers: { 'Authorization': token },
       })
@@ -121,7 +97,6 @@ function Todolist() {
           console.log('resHead', resHead)
           const index = allList.map(item => item.id).indexOf(id)
           setAllList(allList.filter((item, i) => i !== index))
-
           // MySwal.fire({
           //   icon: 'success',
           //   title: resHead.data.message,
@@ -176,8 +151,6 @@ function Todolist() {
       console.log(token)
       if (newTodo) {
         const postData = { todo: { content: newTodo } }
-        console.log(postData)
-        // function postTodo() {
 
         axios.post('https://todoo.5xcamp.us/todos',
           postData, {
@@ -199,9 +172,7 @@ function Todolist() {
               title: error.message,
             })
           })
-        // }
       } else {
-        // throw new Error();
         return MySwal.fire({
           icon: 'error',
           title: '請先填寫待辦事項',

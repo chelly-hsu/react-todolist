@@ -229,7 +229,7 @@ nav {
 nav h1 span {
   width: 243px;
   height: 39px;
-  background: url("./../src/images/logo.png") no-repeat;
+  background: url("./../images/logo.png") no-repeat;
   display: block;
   text-indent: 101%;
   overflow: hidden;
