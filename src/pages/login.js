@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import { useAuth } from "./../components/Context";
 import { Navigate, useNavigate, Link } from "react-router-dom"
 import { useForm } from "react-hook-form"
@@ -9,59 +9,82 @@ import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 const MySwal = withReactContent(Swal);
 
+
 function Login() {
   const { token, setToken } = useAuth()
   const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors } } = useForm();
-  // const axios = require('axios').default;
-  // const onSubmitEvent = (data) => {
-  //   const postData = { user: data };
-  //   console.log(postData)
-  //   axios.post('https://todoo.5xcamp.us/users/sign_in', postData)
-  //     .then(res => {
-  //     alert(`送出成功：${res.data.message}`)
-  //   })
-  //     .catch(err => {
-  //       const error = err.response.data;
-  //       alert(`${error.message}`);
-  //   })
-  // }
+  const [login, setLogin] = useState(false);
 
-  const onSubmitEvent = postData => {
-    const _url = "https://todoo.5xcamp.us/users/sign_in";
-    let myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    fetch(_url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        user: postData
-      })
-    })
-      .then(res => {
-        console.log(res)
-        if (res.status === 401) { //登入失敗
-          throw new Error('登入失敗，請重新檢驗！');
-        }
-        setToken(res.headers.get("authorization"));
-        return res.json()
-      })
-      .then(res => {
-        console.log(res)
+  const axios = require('axios').default;
+  const onSubmitEvent = (data) => {
+    const postData = { user: data };
+    console.log(postData)
+    axios.post('https://todoo.5xcamp.us/users/sign_in', postData)
+      .then(resHead => {
+        console.log(resHead)
+        setToken(resHead.headers.authorization);
+        localStorage.setItem('token', resHead.headers.authorization);
+        localStorage.setItem('userName', resHead.data.nickname);
+        setLogin(true);
         MySwal.fire({
-          title: res.message,
+          icon: 'success',
+          title: `送出成功：${resHead.data.message}`,
         })
         navigate('/todo')
       })
       .catch(err => {
         console.log(err)
+        const error = err.response.data;
         return MySwal.fire({
-          title: err.message,
+          icon: 'error',
+          title: error.message,
         })
       })
   }
+
+  // const onSubmitEvent = postData => {
+
+  //   const _url = "https://todoo.5xcamp.us/users/sign_in";
+  //   let myHeaders = new Headers();
+  //   myHeaders.append("Content-Type", "application/json");
+  //   fetch(_url, {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json'
+  //     },
+  //     body: JSON.stringify({
+  //       user: postData
+  //     })
+  //   })
+  //     .then(resHead => {
+  //       console.log(resHead)
+  //       if (resHead.status === 401) { //登入失敗
+  //         throw new Error('登入失敗，請重新檢驗！');
+  //       }
+  //       setToken(resHead.headers.get("authorization"));
+  //       localStorage.setItem('token', resHead.headers.get("authorization"));
+  //       return resHead.json()
+  //     })
+  //     .then(response => {
+  //       console.log(response)
+  //       localStorage.setItem('userName', response.nickname);
+  //       setLogin(true);
+
+  //       MySwal.fire({
+  //         icon: 'success',
+  //         title: response.message,
+  //       })
+  //       navigate('/todo')
+  //     })
+  //     .catch(err => {
+  //       console.log(err)
+  //       return MySwal.fire({
+  //         icon: 'error',
+  //         title: err.message,
+  //       })
+  //     })
+  // }
 
   return (
     <>
