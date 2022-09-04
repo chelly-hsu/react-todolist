@@ -1,5 +1,5 @@
 import React from "react"
-import { useAuth } from "./../components/Context";
+import { useAuth } from "../components/Context";
 import { useNavigate, Link } from "react-router-dom"
 import { useForm } from "react-hook-form"
 import logoPic from './../images/logo.png'
@@ -9,69 +9,82 @@ import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 const MySwal = withReactContent(Swal);
 
-function Signup() {
+function Register() {
   const { token, setToken } = useAuth();
   const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors }, watch } = useForm();
-  // const axios = require('axios').default;
-  // const onSubmitEvent = (data) => {
-  //   const postData = { user: data };
-  //   console.log(postData)
-  //   axios.post('https://todoo.5xcamp.us/users', postData)
-  //     .then(res => {
-  //       alert(`送出成功：${res.data.message}`)
-  //       setToken(res.headers.get("authorization"));
-  //       return res.json()
-  //     })
-  //     .then(res => {
-  //       navigate('/todo')
-  //     })
-  //     .catch(err => {
-  //       const error = err.response.data;
-  //       alert(`${error.message}:${error.join()}`);
-  //     })
-  // }
 
-  const onSubmitEvent = postData => {
-    const _url = "https://todoo.5xcamp.us/users";
-    console.log({
-      user: postData
-    });
-    let myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    fetch(_url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        user: postData
-      })
-    })
+  const axios = require('axios').default;
+  const onSubmitEvent = (data) => {
+    const postData = { user: data };
+    console.log(postData)
+    axios.post('https://todoo.5xcamp.us/users', postData)
       .then(resHead => {
-        console.log(resHead)
-        setToken(resHead.headers.get("authorization"));
-        return resHead.json()
-      })
-      .then(response => {
-        console.log(response)
+        console.log('resHead', resHead)
+        setToken(resHead.headers.authorization);
+        localStorage.setItem('token', resHead.headers.authorization);
+        localStorage.setItem('userName', resHead.data.nickname);
+
         MySwal.fire({
-          // toast: true,
-          // position: 'top-end',
-          icon: response.message === '註冊成功' ? 'success' : 'error',
-          title: response.message,
-          text: response.error?.join() //if 422 fail
+          icon: 'success',
+          title: resHead.data.message,
         })
-        navigate('/todo') // if 201 success
+        navigate('/todo')
       })
       .catch(err => {
-        console.log(err)
+        console.log('err', err)
+        const error = err.response.data
         return MySwal.fire({
-          title: err.message,
+          icon: 'error',
+          title: error.message,
+          text: error.error?.join()
         })
       })
-
   }
+
+  // const onSubmitEvent = postData => {
+  //   const _url = "https://todoo.5xcamp.us/users";
+  //   console.log({
+  //     user: postData
+  //   });
+  //   let myHeaders = new Headers();
+  //   myHeaders.append("Content-Type", "application/json");
+  //   fetch(_url, {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json'
+  //     },
+  //     body: JSON.stringify({
+  //       user: postData
+  //     })
+  //   })
+  //     .then(resHead => {
+  //       console.log(resHead)
+  //       setToken(resHead.headers.get("authorization"));
+  //       localStorage.setItem('token', resHead.headers.get("authorization"));
+  //       return resHead.json()
+  //     })
+  //     .then(response => {
+  //       console.log(response)
+  //       MySwal.fire({
+  //         // toast: true,
+  //         // position: 'top-end',
+  //         icon: response.message === '註冊成功' ? 'success' : 'error',
+  //         title: response.message,
+  //         text: response.error?.join() //if 422 fail
+  //       })
+  //       localStorage.setItem('userName', response.nickname);
+  //       navigate('/login') // if 201 success
+  //     })
+  //     .catch(err => {
+  //       console.log(err)
+  //       return MySwal.fire({
+  //         icon: 'error',
+  //         title: err.message,
+  //       })
+  //     })
+
+  // }
 
 
   return (
@@ -128,4 +141,4 @@ function Signup() {
   )
 }
 
-export default Signup;
+export default Register;

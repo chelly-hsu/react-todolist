@@ -12,7 +12,7 @@ import {
 } from 'react-router-dom';
 import Todolist from './pages/todolist';
 import Login from './pages/login';
-import Register from './pages/signup'
+import Register from './pages/register';
 
 
 function Layout() {
