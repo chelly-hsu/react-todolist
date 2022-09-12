@@ -4,12 +4,14 @@ import { faPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
 import emptyPic from './../images/empty.png'
 import Header from './../components/Header'
 import { useAuth } from "./../components/Context";
+import { Loading } from "./../components/Loading";
 
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 const MySwal = withReactContent(Swal);
 
 function Todolist() {
+  const [isLoading, setIsLoading] = useState(true)
   const { token } = useAuth();
   const [allList, setAllList] = useState([]); //全部清單
   const [currentTab, setCurrentTab] = useState(1) //目前頁籤
@@ -19,10 +21,10 @@ function Todolist() {
   // 取得清單
   useEffect(() => {
     async function getTodo() {
+      setIsLoading(true)
       await axios.get('https://todoo.5xcamp.us/todos', { headers: { 'Authorization': token } })
         .then(resHead => {
           console.log('resHead', resHead)
-
           setAllList(resHead.data.todos)
           // MySwal.fire({
           //   icon: 'success',
@@ -37,6 +39,7 @@ function Todolist() {
             title: error.message,
           })
         })
+      setIsLoading(false)
     };
     getTodo()
   }, [axios, token])
@@ -67,6 +70,7 @@ function Todolist() {
 
     // 切換 完成｜待完成 change checkbox
     function handleCheckBox(id) {
+      setIsLoading(true)
       axios.patch(`https://todoo.5xcamp.us/todos/${id}/toggle`, {}, {
         headers: { 'Authorization': token },
       })
@@ -78,8 +82,10 @@ function Todolist() {
           //   icon: 'success',
           //   title: resHead.data.message,
           // })
+          setIsLoading(false)
         })
         .catch(err => {
+          setIsLoading(false)
           const error = err.response.data
           return MySwal.fire({
             icon: 'error',
@@ -90,6 +96,7 @@ function Todolist() {
 
     // 刪除 delete button
     function delTodoItem(id) {
+      setIsLoading(true)
       axios.delete(`https://todoo.5xcamp.us/todos/${id}`, {
         headers: { 'Authorization': token },
       })
@@ -101,9 +108,11 @@ function Todolist() {
           //   icon: 'success',
           //   title: resHead.data.message,
           // })
+          setIsLoading(false)
         })
         .catch(err => {
           console.log('err', err)
+          setIsLoading(false)
           const error = err.response.data
           return MySwal.fire({
             icon: 'error',
@@ -149,20 +158,21 @@ function Todolist() {
     function addNewBtn() {
       console.log(newTodo)
       console.log(token)
+      setIsLoading(true)
+      console.log('addNewBtn', isLoading)
       if (newTodo) {
         const postData = { todo: { content: newTodo } }
-
         axios.post('https://todoo.5xcamp.us/todos',
           postData, {
           headers: { 'Authorization': token },
         })
           .then(resHead => {
-            console.log('resHead', resHead)
-            setAllList([...allList, resHead.data])
+            setAllList([...allList, { ...resHead.data, completed_at: null }])
             // MySwal.fire({
             //   icon: 'success',
             //   title: resHead.data.message,
             // })
+            setIsLoading(false)
           })
           .catch(err => {
             console.log('err', err)
@@ -173,11 +183,13 @@ function Todolist() {
             })
           })
       } else {
+        setIsLoading(false)
         return MySwal.fire({
           icon: 'error',
           title: '請先填寫待辦事項',
         })
       }
+
     }
 
     return <>
@@ -190,25 +202,29 @@ function Todolist() {
     </>
   }
 
-  return <>
-    <div id="todoListPage" className="bg-half">
-      <Header></Header>
-      <div className="conatiner todoListPage vhContainer">
-        <div className="todoList_Content">
-          <div className="inputBox">
-            <InputBox></InputBox>
-          </div>
-          {allList.length === 0
-            ? <div style={{ width: "240px", margin: "60px auto", textAlign: "center" }}>
-              <p style={{ marginBottom: "16px" }}>目前尚無代辦事項</p>
-              <div><img src={emptyPic} alt="0代辦事項"></img></div>
+  return (
+    <>
+      { isLoading ? <Loading /> : false}
+      <div id="todoListPage" className="bg-half">
+        <Header></Header>
+        <div className="conatiner todoListPage vhContainer">
+          <div className="todoList_Content">
+            <div className="inputBox">
+              <InputBox></InputBox>
             </div>
-            : <TodoListArea></TodoListArea>
-          }
+            {allList.length === 0
+              ? <div style={{ width: "240px", margin: "60px auto", textAlign: "center" }}>
+                <p style={{ marginBottom: "16px" }}>目前尚無代辦事項</p>
+                <div><img src={emptyPic} alt="0代辦事項"></img></div>
+              </div>
+              : <TodoListArea></TodoListArea>
+            }
+          </div>
         </div>
       </div>
-    </div>
-  </>
+
+    </>
+  )
 }
 
 export default Todolist;
