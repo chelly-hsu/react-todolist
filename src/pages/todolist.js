@@ -69,9 +69,9 @@ function Todolist() {
     }
 
     // 切換 完成｜待完成 change checkbox
-    function handleCheckBox(id) {
+    async function handleCheckBox(id) {
       setIsLoading(true)
-      axios.patch(`https://todoo.5xcamp.us/todos/${id}/toggle`, {}, {
+      await axios.patch(`https://todoo.5xcamp.us/todos/${id}/toggle`, {}, {
         headers: { 'Authorization': token },
       })
         .then(resHead => {
@@ -82,22 +82,21 @@ function Todolist() {
           //   icon: 'success',
           //   title: resHead.data.message,
           // })
-          setIsLoading(false)
         })
         .catch(err => {
-          setIsLoading(false)
           const error = err.response.data
           return MySwal.fire({
             icon: 'error',
             title: error.message,
           })
         })
+      setIsLoading(false)
     }
 
     // 刪除 delete button
-    function delTodoItem(id) {
+    async function delTodoItem(id) {
       setIsLoading(true)
-      axios.delete(`https://todoo.5xcamp.us/todos/${id}`, {
+      await axios.delete(`https://todoo.5xcamp.us/todos/${id}`, {
         headers: { 'Authorization': token },
       })
         .then(resHead => {
@@ -108,17 +107,16 @@ function Todolist() {
           //   icon: 'success',
           //   title: resHead.data.message,
           // })
-          setIsLoading(false)
         })
         .catch(err => {
           console.log('err', err)
-          setIsLoading(false)
           const error = err.response.data
           return MySwal.fire({
             icon: 'error',
             title: error.message,
           })
         })
+      setIsLoading(false)
     }
 
     return <div {...rest}>
@@ -156,11 +154,17 @@ function Todolist() {
 
     //add new todo
     function addNewBtn() {
-      console.log(newTodo)
+      console.log(!newTodo)
       console.log(token)
       setIsLoading(true)
       console.log('addNewBtn', isLoading)
-      if (newTodo) {
+      if (!newTodo.trim()) {
+        setIsLoading(false)
+        return MySwal.fire({
+          icon: 'error',
+          title: '請先填寫待辦事項',
+        })
+      } else {
         const postData = { todo: { content: newTodo } }
         axios.post('https://todoo.5xcamp.us/todos',
           postData, {
@@ -176,18 +180,12 @@ function Todolist() {
           })
           .catch(err => {
             console.log('err', err)
-            const error = err.response.data
-            return MySwal.fire({
+            MySwal.fire({
               icon: 'error',
-              title: error.message,
+              title: err.message,
             })
+            setIsLoading(false)
           })
-      } else {
-        setIsLoading(false)
-        return MySwal.fire({
-          icon: 'error',
-          title: '請先填寫待辦事項',
-        })
       }
 
     }

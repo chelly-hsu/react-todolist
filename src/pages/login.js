@@ -4,46 +4,67 @@ import { Navigate, useNavigate, Link } from "react-router-dom"
 import { useForm } from "react-hook-form"
 import logoPic from './../images/logo.png'
 import imgPic from './../images/img.png'
+import { Loading } from "./../components/Loading";
 
 import Swal from 'sweetalert2';
-import withReactContent from 'sweetalert2-react-content';
-const MySwal = withReactContent(Swal);
+const Toast = Swal.mixin({
+  toast: true,
+  position: 'top',
+  showConfirmButton: false,
+  timer: 1500,
+  timerProgressBar: true,
+  didOpen: (toast) => {
+    toast.addEventListener('mouseenter', Swal.stopTimer)
+    toast.addEventListener('mouseleave', Swal.resumeTimer)
+  }
+})
+
 
 function Login() {
   const { token, setToken } = useAuth()
   const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors } } = useForm();
   const [login, setLogin] = useState(false);
+  const [isLoading, setIsLoading] = useState(false)
 
   const axios = require('axios').default;
-  const onSubmitEvent = (data) => {
+  const onSubmitEvent = async (data) => {
+    setIsLoading(true)
     const postData = { user: data };
     console.log(postData)
-    axios.post('https://todoo.5xcamp.us/users/sign_in', postData)
+    await axios.post('https://todoo.5xcamp.us/users/sign_in', postData)
       .then(resHead => {
         console.log(resHead)
         setToken(resHead.headers.authorization);
-        localStorage.setItem('token', resHead.headers.authorization);
+        localStorage.setItem('token', token);
         localStorage.setItem('userName', resHead.data.nickname);
-        setLogin(true);
-        MySwal.fire({
+
+        Toast.fire({
           icon: 'success',
-          title: `送出成功：${resHead.data.message}`,
+          title: `送出成功：${resHead.data.message}`
         })
+
+        setLogin(true);
+
         navigate('/todo')
+
       })
       .catch(err => {
         console.log(err)
         const error = err.response.data;
-        return MySwal.fire({
+        // return toast.error(`${error.message} QQ`)
+        Toast.fire({
           icon: 'error',
           title: error.message,
         })
+
+        setIsLoading(false)
       })
   }
 
   return (
     <>
+      { isLoading ? <Loading /> : false}
       <div id="loginPage" className="bg-yellow">
         <div className="conatiner loginPage vhContainer ">
           <div className="side">
@@ -75,6 +96,7 @@ function Login() {
           </div>
         </div>
       </div>
+
     </>
   )
 }
