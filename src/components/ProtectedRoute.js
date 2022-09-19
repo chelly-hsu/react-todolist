@@ -4,9 +4,10 @@ import Todolist from './../pages/todolist';
 
 export const ProtectedRoute = ({ children }) => {
     const { token } = useAuth();
-    // console.log(token)
+    console.log('ProtectedRoute', token)
+
     if (!token) {
-        return <Navigate to="/register" replace />;
+        return <Navigate to="/login" replace />;
     }
     return <Todolist />
 };
