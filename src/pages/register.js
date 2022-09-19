@@ -15,10 +15,10 @@ function Register() {
   const { register, handleSubmit, formState: { errors }, watch } = useForm();
 
   const axios = require('axios').default;
-  const onSubmitEvent = (data) => {
+  const onSubmitEvent = async (data) => {
     const postData = { user: data };
     console.log(postData)
-    axios.post('https://todoo.5xcamp.us/users', postData)
+    await axios.post('https://todoo.5xcamp.us/users', postData)
       .then(resHead => {
         console.log('resHead', resHead)
         setToken(resHead.headers.authorization);
