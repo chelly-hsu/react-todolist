@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "./../components/Context";
 import { Loading } from "./../components/Loading";
 
@@ -22,7 +22,11 @@ function Header() {
     const { token, setToken } = useAuth()
     const userName = localStorage.userName;
 
-
+    useEffect(() => {
+        localStorage.setItem('token', token)
+        // console.log('header token', token)
+        setToken(localStorage.getItem('token'))
+    }, []);
 
     const axios = require('axios').default;
     async function logOutBtn() {

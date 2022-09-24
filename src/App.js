@@ -42,7 +42,7 @@ import Register from './pages/register';
 //   );
 // }
 function App() {
-  const [token, setToken] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem('token'));
   return (
     <div className="container">
       <AuthContext.Provider value={{ token, setToken }}>
